@@ -19,7 +19,7 @@ export const danceTiles = function(verdict, guesscount) {
         document.querySelectorAll(`[data-row="${guesscount}"]`).forEach((element, key) => {
             setTimeout(() => {
               element.classList.add('dance');
-            }, key * 500)
+            }, key * 150)
         })
     }
 };

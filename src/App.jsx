@@ -6,12 +6,18 @@ import './App.css';
 import { useEffect, useState } from "react";
 import { check_guess } from "../helpers/keyboard_fxns";
 
-import dict_data from '../data/dictionary';
+
 import words_data from '../data/targetWords.json';
 import { danceTiles, flipTiles } from "../helpers/animations";
 
+const start_date = new Date(2023, 0, 1);
+const msSinceStart = Date.now() - start_date;
+const daysSince = Math.floor(msSinceStart / 1000 / 60 / 60 / 24);
+
 
 const App = () => {
+  
+  const word_of_day = words_data[daysSince].toUpperCase();
 
   const [ guesses, setGuesses ] = useState({
     words: [
@@ -28,10 +34,9 @@ const App = () => {
 
   useEffect(() => {
     
-
     if(guesses.guesscount !== 0) {  // if Enter key has been pressed for next guess
       
-      const verdict = check_guess(["L", "U", "N", "C", "H"], guesses.words[guesses.guesscount-1]);
+      const verdict = check_guess(word_of_day, guesses.words[guesses.guesscount-1]);
       
       // Flip tiles 
       flipTiles(verdict, guesses.guesscount-1)
@@ -50,14 +55,17 @@ const App = () => {
   }, [ guesses.guesscount ]);
 
 
-  // useEffect(() => {
-  //   if(guesses.guesscount != 0) {
-  //     const verdict = check_guess(["L", "U", "N", "C", "H"], guesses.words[guesses.guesscount-1]);
+  useEffect(() => {
+    if(guesses.guesscount != 0) {
 
-  //     setTimeout(danceTiles(verdict, guesses.guesscount-1), 3000)
+      const verdict = check_guess(word_of_day, guesses.words[guesses.guesscount-1]);
+
+      setTimeout(() => {
+        danceTiles(verdict, guesses.guesscount-1)
+      }, 3000)
   
-  //   }
-  // }, [ gameOver ]);
+    }
+  }, [ gameOver ]);
 
   return (
     <div className="App">

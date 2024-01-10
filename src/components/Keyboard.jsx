@@ -1,28 +1,35 @@
 /* eslint-disable react/prop-types */
 
+import { alphabeticKeyResponse, backspaceKeyResponse, enterKeyResponse } from '../../helpers/keyboard_fxns';
 import '../assets/css/Keyboard.css';
 import { useEffect } from 'react';
 
-import dict_data from '../../data/dictionary.json';
 
 const Keyboard = ({ onGuess, status }) => {
     
 
     /** Handle button clicks */
     const handleKeyClick = (e) => {
-        // e.preventDefault();
+        e.preventDefault();
+        onGuess(prev => {
+            return alphabeticKeyResponse(prev, e.target.textContent)
+        })
     };
 
     /** Handle 'Enter' click */
     const handleEnterButtonClick = (e) => {
-        // e.preventDefault();
-        // 
+        e.preventDefault();
+        onGuess(prev => {
+            return enterKeyResponse(prev);
+        })
     }
 
     /** Handle Backspace ckick */
     const handleBackspaceButtonClick = (e) => {
-        // e.preventDefault();
-        // 
+        e.preventDefault();
+        onGuess(prev => {
+            return backspaceKeyResponse(prev);
+        })
     }
 
     /**
@@ -36,55 +43,16 @@ const Keyboard = ({ onGuess, status }) => {
         if(e.key === "Enter") {
         
             onGuess(prev => {
-                if(!dict_data.includes(prev.words[prev.guesscount].join("").toLowerCase())) {
-                    document.querySelectorAll(`[data-row="${prev.guesscount}"]`).forEach((element) => {
-                        element.classList.add('shake');
-                        element.addEventListener("animationend", () => {
-                            element.classList.remove("shake");
-                        }, { once: true });
-                    });
-                    return { ...prev };
-                }
-
-                if(prev.words[prev.guesscount].some(char => char === "")) {
-                    return { words: [ ...prev.words ], guesscount: prev.guesscount };
-                }
-
-                if(prev.guesscount === 5) {
-
-                    return { words: [ ...prev.words ], guesscount: prev.guesscount };
-                }
-
-                return { words: [ ...prev.words ], guesscount: prev.guesscount + 1 };
+                return enterKeyResponse(prev);
             });
         } else if(e.key === "Backspace") {
             onGuess(prev => {   // update previous state
-                let wordscopy = [...prev.words];
-        
-                let word = [...wordscopy[prev.guesscount]];
-                let top = word.findLastIndex(char => char !== "");
-                
-                if(top === -1) return { ...prev };
-
-                word[top] = "";
-                wordscopy[prev.guesscount] = word;
-        
-                return { words: [...wordscopy], guesscount: prev.guesscount };
+                return backspaceKeyResponse(prev);
             });
         } else {
             if (e.key.match(/^[a-z]$/)) {
                 onGuess(prev => {   // update previous state
-                    let wordscopy = [...prev.words];
-            
-                    let word = [...wordscopy[prev.guesscount]];
-                    let top = word.findIndex(char => char === "");
-                    
-                    if(top === -1) return { words: [...wordscopy], guesscount: prev.guesscount };
-
-                    word[top] = e.key.toUpperCase();
-                    wordscopy[prev.guesscount] = word;
-            
-                    return { words: [...wordscopy], guesscount: prev.guesscount };
+                    return alphabeticKeyResponse(prev, e.key)
                 });
             }
         }
